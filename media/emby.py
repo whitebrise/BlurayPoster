@@ -184,11 +184,6 @@ class Emby(Media):
         if self._user_id == data["UserId"]:
             user_data_list = data["UserDataList"]
             user_data = user_data_list[0]
-            # 防止重复播放
-            if (user_data["ItemId"] in self._played_info
-                    and time.time() - self._played_info[user_data["ItemId"]] <= self._repeat_filter_timeout):
-                self.on_message("Warning", "{}s 内不允许播放相同的影片".format(self._repeat_filter_timeout))
-                return
             item_infos = self._query_item(user_data["ItemId"])
             if item_infos is not None and "Items" in item_infos and len(item_infos["Items"]) > 0:
                 for item in item_infos["Items"]:
@@ -197,6 +192,11 @@ class Emby(Media):
                         continue
                     if path.split('.')[-1] in self._exclude_video_ext:
                         logger.info(f"exclude video, path: {path}")
+                        continue
+                    # 防止重复播放
+                    if (item["Id"] in self._played_info
+                            and time.time() - self._played_info[item["Id"]] <= self._repeat_filter_timeout):
+                        self.on_message("Warning", "{}s 内不允许播放相同的影片".format(self._repeat_filter_timeout))
                         continue
                     self._play_item = item
                     logger.info(f"prepare to play this video, path: {path}")
