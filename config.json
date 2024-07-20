@@ -1,0 +1,46 @@
+{
+  "Version": "0.5.0",
+  "LogLevel": "info",
+  "Media": {
+    "Executor": "media.emby.Emby",
+    "Client": "Emby Bluray Poster",
+    "Device": "Bluray Poster",
+    "DeviceId": "whitebrise",
+    "Host": "http://192.168.1.10:8096",
+    "Username": "aabbccddee",
+    "Password": "abcd123456789",
+    "BlockDevices": ["SONY XR-77A95L"],
+    "ExcludeVideoExt": "mp4,mkv",
+    "RepeatFilterTimeout": 120
+  },
+  "Player": {
+    "Executor": "player.oppo.Oppo",
+    "IP": "192.168.1.11",
+    "Auth": [
+      {
+        "Username": "username1",
+        "Password": "password1"
+      },
+      {
+        "Username": "username2",
+        "Password": "password2"
+      }
+    ],
+    "UdpTimeout": 10,
+    "NFSPrefer": true,
+    "MappingPath": [
+      {
+        "Media": "/NAS466C",
+        "SMB": "/NAS466C",
+        "NFS": "/192.168.88.50"
+      }
+    ]
+  },
+  "TV": {
+    "Executor": "tv.sony_bravia.SonyBravia",
+    "IP": "192.168.1.12",
+    "Key": "1234",
+    "HDMI": 1,
+    "PlayStopUri": null
+  }
+}
