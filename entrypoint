@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# 复制 config 目录中的文件到 $CONFIG_DIR，但不覆盖已存在的文件
+for file in /app/config/*; do
+  filename=$(basename "$file")
+  extension="${filename##*.}"
+  name="${filename%.*}"
+  template_filename="${name}.template.${extension}"
+
+  # 如果文件已经存在，并且不是模板文件
+  if [ -e "$CONFIG_DIR/$filename" ] && [ "$extension" != "template" ]; then
+    # 如果模板文件不存在，则复制为模板文件
+    if [ ! -e "$CONFIG_DIR/$template_filename" ]; then
+      cp "$file" "$CONFIG_DIR/$template_filename"
+    else
+      # 如果模板文件存在，则覆盖
+      cp "$file" "$CONFIG_DIR/$template_filename"
+    fi
+  else
+    # 文件不存在或是模板文件，直接复制
+    cp "$file" "$CONFIG_DIR/"
+  fi
+done
+
+# 执行传递的所有参数
+exec "$@"

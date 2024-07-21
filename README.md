@@ -26,7 +26,51 @@
 - [emby官网下载页面](https://emby.media/download.html)
 - [ ] 媒体库里新增文件夹时，记下你选择的文件夹路径，后面的路径配置里要用(例如文件夹路径是\\NAS466C/Video/电影)。**注意**： 配置文件夹时，下面还有一个 《`（可选）共享的网络文件夹 `》选项，可以留空。如果留空，那就记住前面那个文件夹路径；如果你没有留空，那么就记这个填写的可选路径。
 
-### 3. 安装python(建议安装3.11)
+
+### 3. 安装程序
+安装方式有2种，docker方式和直接安装, 建议使用docker方式
+
+#### 3.1 docker安装
+
+##### docker-cli
+```docker-cli
+docker run -itd \
+    --name blurayposter \
+    --hostname blurayposter \
+    -v /config_dir:/config \
+    -e 'PUID=0' \
+    -e 'PGID=0' \
+    -e 'UMASK=000' \
+    -e 'TZ=Asia/Shanghai' \
+    --restart always \
+    whitebrise/blurayposter:latest
+```
+
+##### docker-compose
+```docker-compose
+version: '3.8'
+
+services:
+    blurayposter:
+        image: whitebrise/blurayposter:latest
+        container_name: blurayposter
+        volumes:
+            - /config_dir:/config
+        environment:
+            - 'PUID=0'
+            - 'PGID=0'
+            - 'UMASK=000'
+            - 'TZ=Asia/Shanghai'
+        restart: always
+        tty: true
+        stdin_open: true
+```
+- 其中, /config_dir为配置文件文件夹，强烈建议修改成宿主机上的位置，这样以后你重装docker和升级时，原有配置不会丢失
+- 容器安装好后，先停止运行, 配置完你的config.json后，再点击运行即可，配置方法见下方《配置文件参数说明》
+
+
+#### 3.2 直接安装
+##### 3.2.1 安装python(建议安装3.11)
 - [python下载页面](https://www.python.org/downloads/)
 - 安装python(网络上搜索安装教程)
 
@@ -35,30 +79,30 @@
 pip install -r requirements.txt
 ```
 
-### 4. 下载代码并解压
+##### 3.2.2 下载代码并解压
 下载zip压缩包到本地并解压
 
 
-### 5. 配置config.json
+##### 3.2.3. 配置config.json
 
 - [ ] 配置参数参见后面配置文件参数说明
 
-### 6. 启动服务
+##### 3.2.4 启动服务
 服务可以24h启动，只要你的用户名密码文件路径等这种配置不变的，就不需要重启程序。期间开关播放器、电视、功放、海报墙都没有影响，建议装在nas上。
 
-#### Linux
+###### Linux
 ```linux
 cd /home/{your user}/BlurayPoster
 nohup python bluray_poster.py > blu.out 2>&1 &
 ```
 
-#### Windows
+###### Windows
 ```windows
 双击 bluray_poster.py 启动
 保持服务运行可以加入到开机自启列表或者就不关机
 ```
 
-### 7. enjoy
+### 4. enjoy
 - 先打开播放器, 电视, 功放等
 - 打开任意一个emby的app(手机/电视/网页/其他设备),登录和你配置文件中相同的用户
 - 选择影片并享受海报墙的便捷+蓝光播放器的画质
