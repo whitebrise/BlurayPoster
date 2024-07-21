@@ -32,10 +32,10 @@ def setup_logging(log_level_str):
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setLevel(log_level)
-    logger.addHandler(console_handler)
+    if log_level == logging.DEBUG:
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(log_level)
+        logger.addHandler(console_handler)
 
 
 def dynamic_import(module_name, class_name):

@@ -501,7 +501,9 @@ class Oppo(Player):
         for mapping_path in self._mapping_path_list:
             real_path = media_path.replace(mapping_path["Media"], mapping_path["NFS"], 1) if self._use_nfs \
                 else media_path.replace(mapping_path["Media"], mapping_path["SMB"], 1)
+        logger.debug("transfer path, from: {}, to: {}".format(media_path, real_path))
         sever, folder, file = self.extract_path_parts(real_path)
+        logger.debug("sever: {}, folder:  {}, file: {}".format(sever, folder, file))
         if self._use_nfs:
             if not self._login_nfs(sever):
                 return on_message("Error", "cannot login nfs")
