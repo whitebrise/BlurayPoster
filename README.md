@@ -8,7 +8,7 @@
 - [ ] 播放器目前仅支持oppo系, 其他的播放器我不太清楚能不能控制，我也没有, 无法测试
 - [ ] 目前TV仅支持索尼bravia系和Lg webos电视，因为我没有其他电视，无法测试
 - [ ] 目前没写功放控制, 不能联动功放，有功放又有能力的可以自己添加功放控制解锁更多玩法
-- [ ] 如果有问题, 可以提issue, 并且把发生问题时的日志(程序目录/logs下)发上来
+- [ ] 如果有问题, 可以提issue。把config.json文件中的"loglevel"改为"debug"然后运行程序,并且把发生问题时的日志(程序目录/logs下)发上来
 
 
 ## 二、 开始
@@ -93,7 +93,7 @@ pip install -r requirements.txt
 ###### Linux
 ```linux
 cd /home/{your user}/BlurayPoster
-nohup python bluray_poster.py > blu.out 2>&1 &
+nohup python bluray_poster.py > /dev/null 2>&1 &
 ```
 
 ###### Windows
@@ -214,7 +214,7 @@ c. 继续点击，直到找到你媒体库挂载的相同路径文件夹, 比如
 d. 那么我的SMB路径就是 "/NAS466C/Video/电影", nfs同理
 e. 自己的媒体库有几个路径就配几个，确保每个媒体库路径都有正确的配置, 比如/NAS466C/Video/电视剧，/NAS466C/Video/动漫
 
-2. 进阶配置
+2. 进阶配置(如果你上面配置的路径中包含中文, 强烈建议往下看)
 傻瓜配置后,你有以下3个目录
 media："/mnt/Video/电影"
 "SMB": "/NAS466C/Video/电影"
@@ -228,16 +228,11 @@ media："/mnt/Video/动漫"
 "SMB": "/NAS466C/Video/动漫"
 "NFS": "/192.168.1.10/Video/动漫"
 
-看第一个目录, 可以发现后面路径都是/Video/电影, 相同的路径可以省略掉，例如我可以修改成
+看第一个目录, 可以发现后面路径都是/Video/电影, 相同的路径可以约掉，例如我可以修改成
 media："/mnt/Video"
 "SMB": "/NAS466C/Video"
 "NFS": "/192.168.1.10/Video"
 甚至也可以修改成
-media："/mnt"
-"SMB": "/NAS466C"
-"NFS": "/192.168.1.10"
-
-恰好这三个路径都可以缩写成
 media："/mnt"
 "SMB": "/NAS466C"
 "NFS": "/192.168.1.10"
