@@ -478,6 +478,13 @@ class Oppo(Player):
         启动前
         :return:
         """
+        # 路径标准化检查(对可能存在的特殊路径处理)
+        for mapping_path in self._mapping_path_list:
+            if mapping_path["Media"] == "/":
+                if self._use_nfs and mapping_path["NFS"][-1] != "/":
+                    mapping_path["NFS"] += "/"
+                elif self._use_nfs is not True and mapping_path["SMB"][-1] != "/":
+                    mapping_path["SMB"] += "/"
         thread = threading.Thread(target=self._wait_for_get_device_list)
         thread.daemon = True
         thread.start()
@@ -497,13 +504,14 @@ class Oppo(Player):
         if self._play_status >= 0:
             return on_message("Notification", "movie is playing or prepare to playing, wait!")
         # 转换目录
+        media_path = media_path.replace("\\", "/").replace("//", "/")
         real_path = media_path
         for mapping_path in self._mapping_path_list:
             real_path = media_path.replace(mapping_path["Media"], mapping_path["NFS"], 1) if self._use_nfs \
                 else media_path.replace(mapping_path["Media"], mapping_path["SMB"], 1)
         logger.debug("transfer path, from: {}, to: {}".format(media_path, real_path))
         sever, folder, file = self.extract_path_parts(real_path)
-        logger.debug("sever: {}, folder:  {}, file: {}".format(sever, folder, file))
+        logger.debug("curt path, sever: {}, folder:  {}, file: {}".format(sever, folder, file))
         if self._use_nfs:
             if not self._login_nfs(sever):
                 return on_message("Error", "cannot login nfs")
