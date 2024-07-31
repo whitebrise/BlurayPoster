@@ -507,8 +507,8 @@ class Oppo(Player):
         media_path = media_path.replace("\\", "/").replace("//", "/")
         real_path = media_path
         for mapping_path in self._mapping_path_list:
-            real_path = media_path.replace(mapping_path["Media"], mapping_path["NFS"], 1) if self._use_nfs \
-                else media_path.replace(mapping_path["Media"], mapping_path["SMB"], 1)
+            real_path = real_path.replace(mapping_path["Media"], mapping_path["NFS"], 1) if self._use_nfs \
+                else real_path.replace(mapping_path["Media"], mapping_path["SMB"], 1)
         logger.debug("transfer path, from: {}, to: {}".format(media_path, real_path))
         sever, folder, file = self.extract_path_parts(real_path)
         logger.debug("curt path, sever: {}, folder:  {}, file: {}".format(sever, folder, file))
