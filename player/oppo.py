@@ -480,10 +480,10 @@ class Oppo(Player):
         """
         # 路径标准化检查(对可能存在的特殊路径处理)
         for mapping_path in self._mapping_path_list:
-            if mapping_path["Media"] == "/":
+            if len(mapping_path["Media"]) > 0 and mapping_path["Media"][-1] == "/":
                 if self._use_nfs and mapping_path["NFS"][-1] != "/":
                     mapping_path["NFS"] += "/"
-                elif self._use_nfs is not True and mapping_path["SMB"][-1] != "/":
+                if self._use_nfs is not True and mapping_path["SMB"][-1] != "/":
                     mapping_path["SMB"] += "/"
         thread = threading.Thread(target=self._wait_for_get_device_list)
         thread.daemon = True
@@ -504,11 +504,13 @@ class Oppo(Player):
         if self._play_status >= 0:
             return on_message("Notification", "movie is playing or prepare to playing, wait!")
         # 转换目录
-        media_path = media_path.replace("\\", "/").replace("//", "/")
+        media_path = (media_path.replace('\\\\', '\\').
+                      replace("\\", "/").replace("//", "/"))
         real_path = media_path
         for mapping_path in self._mapping_path_list:
             real_path = real_path.replace(mapping_path["Media"], mapping_path["NFS"], 1) if self._use_nfs \
                 else real_path.replace(mapping_path["Media"], mapping_path["SMB"], 1)
+        real_path = real_path.replace("//", "/")
         logger.debug("transfer path, from: {}, to: {}".format(media_path, real_path))
         sever, folder, file = self.extract_path_parts(real_path)
         logger.debug("curt path, sever: {}, folder:  {}, file: {}".format(sever, folder, file))
