@@ -10,7 +10,7 @@
 - [ ] 播放器目前支持oppo系,包括203，205这种，各种山寨魔改的oppo蓝光机也没问题。
 - [ ] 可以联动的TV目前仅支持索尼bravia系和Lg webos电视，后续有其他电视可能会添加，如果你的电视暂时不在支持列表中或者你是投影，可以手机/电脑/平板选片。
 - [ ] 功放和回音壁控制还在开发中, 目前暂时不能联动功放，请使用支持eArc的设备或者采用音画分离以获得最佳智能化效果。
-- [ ] 如果有问题, 可以提issue。把config.json文件中的"loglevel"改为"debug"然后运行程序,并且把发生问题时的日志(程序目录/logs下)发上来
+- [ ] 如果有问题, 可以提issue。把config.yaml文件中的"loglevel"改为"debug"然后运行程序,并且把发生问题时的日志(程序目录/logs下)发上来
 
 
 ## 二、 开始
@@ -68,7 +68,7 @@ services:
         stdin_open: true
 ```
 - 其中, /config_dir为配置文件文件夹，强烈建议修改成宿主机上的位置，这样以后你重装docker和升级时，原有配置不会丢失
-- 容器安装好后，先停止运行, 配置完你的config.json后，再点击运行即可，配置方法见下方《配置文件参数说明》
+- 容器安装好后，先停止运行, 配置完你的config.yaml后，再点击运行即可，配置方法见下方《配置文件参数说明》
 
 
 #### 3.2 直接安装
@@ -85,9 +85,9 @@ pip install -r requirements.txt
 下载zip压缩包到本地并解压
 
 
-##### 3.2.3. 配置config.json
+##### 3.2.3. 配置config.yaml
 
-- [ ] 配置参数参见后面配置文件参数说明
+- [ ] 配置参数参见配置文件
 
 ##### 3.2.4 启动服务
 服务可以24h启动，只要你不改配置文件，就不需要重启程序。期间开关播放器、电视、功放、海报墙都没有影响，建议装在能24h运行的设备上, 比如nas等。
@@ -112,143 +112,10 @@ nohup python bluray_poster.py > /dev/null 2>&1 &
 - [ ] 独立使用的设备只需要登录不同的emby用户就可以了
 
 
-## 三、 配置文件参数说明
-- 配置文件采用json格式和规范,配置完后记得去校验一下格式是否正确。 [点此在线校验](https://m.bejson.com/json/format/)
-
-config.json
-```config.json
-{
-  "Version": "0.5.0",                    // 版本号(不用动)
-  "LogLevel": "info",                    // 日志类型(如果发生问题搞不定的，把这个改成debug然后运行，再把出问题时候的日志发上来)
-  "Media": {            
-    "Executor": "media.emby.Emby",       // 引用的媒体库执行器, 不要改
-    "Client": "Emby Bluray Poster",      // 设备客户端, 不要改
-    "Device": "Bluray Poster",           // emby服务端显示的设备名称， 不要改
-    "DeviceId": "BlueWhite",             // 设备唯一id， 不要改
-    "Host": "http://192.168.1.10:8096",  // emby服务器地址:端口, 改成你自己的
-    "Username": "aabbccddee",            // emby的用户名, 改成你自己的
-    "Password": "abcd123456789",         // emby的用户密码, 改成你自己的
-    "BlockDevices": ["SONY XR-77A95L"],  // 阻止播放的设备列表, 改成你自己的
-                                            (在app上选片后，本身设备也会进行串流播放，
-                                            通过添加设备名称列表，比如你想选片的电视/手机，可以阻止它们串流播放，
-                                            避免播放器和app两个同时播放
-                                            该设备名称可在emby-设备里看到，图片下面第一排就是设备名)
-    "ExcludeVideoExt": "mp4,mkv",        // 排除的文件扩展名
-                                            (用,隔开，格式命中的文件会直接用点击海报的那个设备播放，不会调用蓝光机，
-                                            避免蓝光机对一些格式的流媒体文件支持不佳)
-    "RepeatFilterTimeout": 120           // 重复检测，同一个视频在xx秒内不允许重复播放，防止快速点击播放/停止造成的反复启动蓝光机
-  },
-  "Player": {
-    "Executor": "player.oppo.Oppo",      // 引用的播放机执行器，不要改
-    "IP": "192.168.1.11",                // 播放机ip, 改成你自己的
-    "Auth": [                            // 使用smb(比如要看云盘挂载)，必须添加两个不同的smb可访问用户。使用nfs可以随便乱填
-      {                                  
-        "Username": "username1",         // smb用户名1
-        "Password": "password1"          // smb密码1
-      },
-      {
-        "Username": "username2",         // smb用户名2
-        "Password": "password2"          // smb密码2
-      }
-    ],
-    "UdpTimeout": 10,                      // udp超时时间， 不要改
-    "NFSPrefer": true,                     // 是否优先启用nfs(建议优先nfs,看云盘挂载的需要用smb）
-
-    "MappingPath": [                       // 文件夹映射路径, 需要配置你自己的文件夹路径映射,详见下面的路径映射说明
-      {
-        "Media": "/NAS466C",               // emby媒体库地址          
-        "SMB": "/NAS466C",                 // SMB路径映射
-        "NFS": "/192.168.88.50",           // NFS地址映射
-      }
-    ]
-  },
-  "TV": {
-    "Executor": "tv.sony_bravia.SonyBravia",    // 引用的TV执行器(目前有2个，一个sony bravia，一个lg的, 根据你的电视类型选择
-                                                                索尼就用tv.sony_bravia.SonyBravia, LG就用tv.lg_webos.LGWebos
-                                                                如果有其他人开发的文件, 改为tv.<filename>.<classname>就行
-                                                                需要自己开发其他的见开发者说明)
-    "IP": "192.168.1.12",                       // 电视IP, 改成你自己的
-    "Key": "1234",                              // 电视控制识别码, 改成你自己的
-    "HDMI": 1,                                  // 蓝光机对应的HDMI口, 改成你自己的
-    "PlayStopUri": null                         // 播放结束后电视默认切换策略，有三种 
-                                                   null: 执行默认策略, sony为跳转到emby app, Lg为返回原来页面
-                                                   "app=xxxx",例如"app=netflix" 代表返回netflix app
-                                                   "hdmi=x", 例如"hdmi=3"代表返回 hdmi 3输入源
-  }
-}
-
-```
-
-路径映射说明:
-
-*注意:*
-
-`路径配置的分割符全部都要改为"/", 无论你是windows还是linux还是其他的，无论原来的分割符是"/","//","\","\\"甚至"\\\\"，都统一改为"/"`
-
-`路径以/开头, 结尾不要/`
-
-`不是smb和nfs都必须配置, 你用的哪个就配置哪个，另一个配置可以直接留"", 当然你全配置也没问题`
-```angular2html
-有2种配置方式
-
-比如我的文件夹分类是这样
-
-NAS466C/Video/
-├── 电影/
-│   ├── 电影1
-│   └── 电影2
-├── 电视剧/
-│   ├── 电视剧1
-│   ├── 电视剧2/
-│   │   ├── 电视剧2-s01
-│   │   └── 电视剧2-s02
-├── 动漫/
-    ├── 动漫1
-    └── 动漫2
-
-1. 傻瓜配置(注意路径中的大小写)
-a. 首先获取emby媒体库里的地址(直接在媒体库里复制出来, 比如是/mnt/Video/电影),修改分隔符, 填写到 Media中(例如"/mnt/Video/电影")
-b. 打开oppo, 点击网络, 显示出来的smb设备和nfs设备就是路径开头,例如能看到一个smb设备"NAS466C", 一个nfs设备"192.168.1.10"
-c. 继续点击，直到找到你媒体库挂载的相同路径文件夹, 比如我点击的顺序是NAS466C -> Video -> 电影(注意中间还有一个图片/音乐/视频, 那个是oppo自己虚拟的，跟你的实际目录没关系，忽略掉)
-d. 那么我的SMB路径就是 "/NAS466C/Video/电影", nfs同理
-e. 自己的媒体库有几个路径就配几个，确保每个媒体库路径都有正确的配置, 比如/NAS466C/Video/电视剧，/NAS466C/Video/动漫
-
-2. 进阶配置(如果你上面配置的路径中包含中文, 强烈建议往下看)
-傻瓜配置后,你有以下3个目录
-media："/mnt/Video/电影"
-"SMB": "/NAS466C/Video/电影"
-"NFS": "/192.168.1.10/Video/电影"
-
-media："/mnt/Video/电视剧"
-"SMB": "/NAS466C/Video/电视剧"
-"NFS": "/192.168.1.10/Video/电视剧"
-
-media："/mnt/Video/动漫"
-"SMB": "/NAS466C/Video/动漫"
-"NFS": "/192.168.1.10/Video/动漫"
-
-看第一个目录, 可以发现后面路径都是/Video/电影, 相同的路径是可以约掉的
-例如我可以约掉 "电视剧" 修改成
-media："/mnt/Video"
-"SMB": "/NAS466C/Video"
-"NFS": "/192.168.1.10/Video"
-甚至也可以继续约掉 "Video" 修改成
-media："/mnt"
-"SMB": "/NAS466C"
-"NFS": "/192.168.1.10"
-
-所以，配置的最佳路径为
-media："/mnt"
-"SMB": "/NAS466C"
-"NFS": "/192.168.1.10"
-
-如果第一步傻瓜配置中路径有中文的，建议按第二步说的，把相同的路径约掉，尽量避开中文。
-```
-
-## 四、 开发者说明
+## 三、 开发者说明
 
 见 `DEVELOPMENT.md`
 
 
-## 五、感谢
+## 四、感谢
 灵感来源于[xnoppo](https://github.com/siberian-git/Xnoppo)

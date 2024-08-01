@@ -1,7 +1,7 @@
 """
 配置管理器
 """
-import json
+import yaml
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,8 +18,8 @@ class Configuration(object):
         :return:
         """
         try:
-            with open(self._path, 'r') as file:
-                self._config = json.load(file)
+            with open(self._path, 'r', encoding='utf-8') as file:
+                self._config = yaml.safe_load(file)
                 return True
         except Exception as e:
             logger.error(f"read config file error: {e}")

@@ -20,7 +20,7 @@ class Emby(Media):
             self._host = config.get('Host')
             self._user_name = config.get('Username')
             self._password = config.get('Password')
-            self._exclude_video_ext = str.split(config.get("ExcludeVideoExt", "mp4,mkv"), ",")
+            self._exclude_video_ext = config.get("ExcludeVideoExt", [])
             self._client = config.get("Client")
             self._device = config.get("Device")
             self._device_id = config.get("DeviceId")

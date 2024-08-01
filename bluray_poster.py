@@ -105,7 +105,7 @@ def initialize_components(config):
 
 if __name__ == "__main__":
     try:
-        config_dir = os.getenv('CONFIG_DIR', 'config') + "/config.json"
+        config_dir = os.getenv('CONFIG_DIR', 'config') + "/config.yaml"
         my_config = Configuration(path=config_dir)
         if my_config.initialize():
             setup_logging(my_config.get("LogLevel"))
