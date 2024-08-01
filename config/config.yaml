@@ -1,0 +1,153 @@
+# YAML配置
+
+# 版本号
+Version: "0.6.1"
+
+# 日志级别(如果发生问题搞不定的，把info改成debug然后重启，再把出问题时候的日志发上来, 问题修复后再改回info)
+LogLevel: info
+
+
+# 媒体库配置
+Media:
+  # 引用的媒体库执行器, 不要改
+  Executor: media.emby.Emby
+  # 设备客户端, 不要改
+  Client: Emby Bluray Poster
+  # 媒体库服务端显示的设备名称， 不要改
+  Device: Bluray Poster
+  # 设备唯一id， 不要改
+  DeviceId: whitebrise
+  # 媒体库服务器地址:端口, 改成你自己的
+  Host: http://192.168.1.10:8096
+  # 媒体库服务器的用户名, 改成你自己的
+  Username: aabbccddee
+  # 媒体库服务器的密码, 改成你自己的
+  Password: abcd123456789
+  # 阻止播放的设备列表, 改成你自己的, 一行一个
+  # 在app上选片后，本身设备也会进行串流播放，通过添加设备名称列表，比如你想选片的电视/手机，可以阻止它们串流播放，避免播放器和app两个同时播放
+  # 该设备名称可在 emby服务器-设备 里看到，每个设备图片下面第一排就是设备名
+  BlockDevices:
+    - SONY XR-77A95L
+  # 排除的文件扩展名, 一行一个
+  # 格式命中的文件会直接用点击海报的那个设备播放，不会调用蓝光机
+  ExcludeVideoExt:
+    - mp4
+    - mkv
+  # 重复检测时间, 不要改
+  RepeatFilterTimeout: 120
+
+
+# 播放器配置
+Player:
+  # 引用的播放机执行器，不要改
+  Executor: player.oppo.Oppo
+  # 播放机ip, 改成你自己的
+  IP: 192.168.1.11
+  # SMB认证信息(按照下方格式，配置至少2个不同的用户, 不用smb可以不改)
+  Auth:
+    - Username: username1
+      Password: password1
+    - Username: username2
+      Password: password2
+  # udp超时时间，不要改
+  UdpTimeout: 10
+  # 是否优先启用nfs, true为使用nfs, false为使用smb
+  NFSPrefer: true
+  # 文件夹映射路径(不用的协议路径值可以留空)
+  # 文件最后有路径配置说明
+  MappingPath:
+    - Media: /path1
+      SMB: /smb_host1
+      NFS: /192.168.1.10/path1
+    - Media: /path2
+      SMB: /smb_host2
+      NFS: /192.168.1.10/path2
+
+
+# 电视配置
+TV:
+  # 引用的TV执行器
+  # 目前有2个，一个sony bravia，一个lg的, 根据你的电视类型选择
+  # 索尼就用tv.sony_bravia.SonyBravia, LG就用tv.lg_webos.LGWebos
+  Executor: tv.sony_bravia.SonyBravia
+  # 电视IP, 改成你自己的
+  IP: 192.168.1.12
+  # 电视控制识别码, 改成你自己的
+  Key: "1234"
+  # 播放机对应的HDMI口, 改成你自己的
+  HDMI: 1
+  # 播放结束后电视默认切换策略, 改成你自己的
+  # null 执行默认策略, sony为跳转到emby app, Lg为返回原来页面
+  # app=xxxx 例如"app=netflix" 代表返回netflix app
+  # hdmi=x 例如"hdmi=3"代表返回 hdmi 3输入源
+  PlayStopUri: null
+
+
+
+#### 路径配置说明 -> 开始
+#
+#
+#  路径配置的分割符全部都要改为"/", 无论你是windows还是linux还是其他的，无论原来的分割符是"/","//","\","\\"甚至"\\\\"，都统一改为"/"
+#  路径以/开头, 结尾不要/
+#  不是smb和nfs都必须配置, 你用的哪个就配置哪个，另一个配置可以直接留空, 当然你全配置也没问题
+#
+#  有2种配置方式
+#
+#  比如我的文件夹分类是这样
+#
+#  NAS466C/Video/
+#  ├── 电影/
+#  │   ├── 电影1
+#  │   └── 电影2
+#  ├── 电视剧/
+#  │   ├── 电视剧1
+#  │   ├── 电视剧2/
+#  │   │   ├── 电视剧2-s01
+#  │   │   └── 电视剧2-s02
+#  ├── 动漫/
+#      ├── 动漫1
+#      └── 动漫2
+#
+#  1. 傻瓜配置(注意路径中的大小写)
+#
+#  a. 首先获取emby媒体库里的地址(直接在媒体库里复制出来, 比如是/mnt/Video/电影),修改分隔符, 填写到 Media中(例如"/mnt/Video/电影")
+#  b. 打开oppo, 点击网络, 显示出来的smb设备和nfs设备就是路径开头,例如能看到一个smb设备"NAS466C", 一个nfs设备"192.168.1.10"
+#  c. 继续点击，直到找到你媒体库挂载的相同路径文件夹, 比如我点击的顺序是NAS466C -> Video -> 电影
+#    (注意中间还有一个图片/音乐/视频, 那个是oppo自己虚拟的，跟你的实际目录没关系，忽略掉)
+#  d. 那么我的SMB路径就是 "/NAS466C/Video/电影", nfs同理
+#  e. 自己的媒体库有几个路径就配几个，确保每个媒体库路径都有正确的配置, 比如/NAS466C/Video/电视剧，/NAS466C/Video/动漫
+#
+#  2. 进阶配置(如果你上面配置的路径中包含中文, 强烈建议往下看)
+#
+#  傻瓜配置后,你有以下3个目录
+#  media："/mnt/Video/电影"
+#  "SMB": "/NAS466C/Video/电影"
+#  "NFS": "/192.168.1.10/Video/电影"
+#
+#  media："/mnt/Video/电视剧"
+#  "SMB": "/NAS466C/Video/电视剧"
+#  "NFS": "/192.168.1.10/Video/电视剧"
+#
+#  media："/mnt/Video/动漫"
+#  "SMB": "/NAS466C/Video/动漫"
+#  "NFS": "/192.168.1.10/Video/动漫"
+#
+#  看第一个目录, 可以发现后面路径都是/Video/电影, 相同的路径是可以约掉的
+#  例如我可以约掉 "电视剧" 修改成
+#  media："/mnt/Video"
+#  "SMB": "/NAS466C/Video"
+#  "NFS": "/192.168.1.10/Video"
+#  甚至也可以继续约掉 "Video" 修改成
+#  media："/mnt"
+#  "SMB": "/NAS466C"
+#  "NFS": "/192.168.1.10"
+#
+#  所以，配置的最佳路径为
+#  media："/mnt"
+#  "SMB": "/NAS466C"
+#  "NFS": "/192.168.1.10"
+#
+#  如果第一步傻瓜配置中路径有中文的，建议按第二步说的，把相同的路径约掉，尽量避开中文。
+#
+#
+#### 路径配置说明 -> 结束
