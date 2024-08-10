@@ -20,12 +20,16 @@ class Emby(Media):
             self._host = config.get('Host')
             self._user_name = config.get('Username')
             self._password = config.get('Password')
-            self._exclude_video_ext = config.get("ExcludeVideoExt", [])
+            self._exclude_video_ext = config.get("ExcludeVideoExt")
+            if self._exclude_video_ext is None:
+                self._exclude_video_ext = []
             self._client = config.get("Client")
             self._device = config.get("Device")
             self._device_id = config.get("DeviceId")
             self._version = config.get('Version')
-            self._block_devices = config.get('BlockDevices', [])
+            self._block_devices = config.get('BlockDevices')
+            if self._block_devices is None:
+                self._block_devices = []
             self._repeat_filter_timeout = config.get("RepeatFilterTimeout", 120)
             self._session = None
             self._block_sessions = []
@@ -222,8 +226,10 @@ class Emby(Media):
                     for block_session in self._block_devices:
                         if session["DeviceName"] == block_session:
                             self._block_sessions.append(session)
+                            break
                         elif session["DeviceName"] == self._device:
                             self._session = session
+                            break
                 if len(self._block_sessions) < len(self._block_devices):
                     logger.warning("not all block devices find their sessions")
                 return self._session is not None
@@ -247,7 +253,7 @@ class Emby(Media):
                 "ControllingUserId": "string"
             }
             res = requests.post(url=url, headers=headers, json=body)
-            if res.status_code == 204:
+            if res. status_code == 204:
                 logger.debug("media play stop successfully")
                 return True
             else:

@@ -6,6 +6,8 @@
 BlurayPoster/
 ├── av/                       # 功放执行器目录
 │   ├── __init__.py
+├── config/                   # 配置文件目录
+│   ├── config.yaml           
 ├── media/                    # 媒体库执行器目录
 │   ├── __init__.py     
 │   ├── emby.py               
@@ -18,9 +20,10 @@ BlurayPoster/
 │   └── lg_webos.py      
 ├── abstract_classes.py       # 基类
 ├── bluray_poster.py          # 主程序
-├── config.json               # 配置文件
 ├── configuration.py          
 ├── DEVELOPMENT.md            # 开发者文档
+├── Dockerfile    
+├── entrypoint         
 ├── README.md                 # 项目介绍文档
 └── requirements.txt          # 依赖文件
 ```
@@ -93,21 +96,14 @@ class Samsung(TV):
 
 ```
 
-config.json
-```json
-{
-  "Version": "1.0.0",
-  "LogLevel": "debug",
-  // ...
-  // ...
-  "TV": {
-    "Executor": "tv.samsung.Samsung",  // Executor write "foldername.filename.classname"
-    "IP": "192.168.1.10",
-    "Key": "1234",
-    "HDMI": 1,
-    "PlayStopUri": null
-  }
-}
+config.yaml
+```yaml
+TV:
+  Executor: tv.samsung.Samsung  # Executor write "foldername.filename.classname"
+  IP: 192.168.1.12
+  Key: "1234"
+  HDMI: 1
+  PlayStopUri: null
 
 ```
 至此, 一个新的TV设备开发完成

@@ -26,7 +26,8 @@
 
 ### 2. 安装emby server并配置好影片海报墙
 - [emby官网下载页面](https://emby.media/download.html)
-- [ ] 媒体库里新增文件夹时，记下你选择的文件夹路径，后面的路径配置里要用(例如文件夹路径是\\NAS466C/Video/电影)。**注意**： 配置文件夹时，下面还有一个 《`（可选）共享的网络文件夹 `》选项，可以留空。如果留空，那就记住前面那个文件夹路径；如果你没有留空，那么就记这个填写的可选路径。
+- [ ] 媒体库里新增文件夹时，记下你选择的文件夹路径，后面的路径配置里要用(例如文件夹路径是\\NAS466C/Video/电影)。**注意**： 配置文件夹时，下面还有一个 《`（可选）共享的网络文件夹 `》选项，一般可以留空。但如果你的emby媒体库文件夹路径不是以"/"开头(比如你是windows硬盘，配的文件夹路径是d:/movie)，那么就需要填写这个网络路径不能留空。
+- [ ] `（可选）共享的网络文件夹 `如果留空，那就记住前面那个文件夹路径；如果没有留空，那么就记这个填写的可选路径。
 
 
 ### 3. 安装程序
@@ -39,7 +40,7 @@
 docker run -itd \
     --name blurayposter \
     --hostname blurayposter \
-    -v /config_dir:/config \
+    -v /blurayposter/config:/config \
     -e 'PUID=0' \
     -e 'PGID=0' \
     -e 'UMASK=000' \
@@ -57,7 +58,7 @@ services:
         image: whitebrise/blurayposter:latest
         container_name: blurayposter
         volumes:
-            - /config_dir:/config
+            - /blurayposter/config:/config
         environment:
             - 'PUID=0'
             - 'PGID=0'
@@ -67,8 +68,9 @@ services:
         tty: true
         stdin_open: true
 ```
-- 其中, /config_dir为配置文件文件夹，强烈建议修改成宿主机上的位置，这样以后你重装docker和升级时，原有配置不会丢失
+- 其中, /blurayposter/config为配置文件使用的文件目录，该目录含有配置文件config.yaml
 - 容器安装好后，先停止运行, 配置完你的config.yaml后，再点击运行即可
+- 每次修改完配置文件，必须重启后才能生效
 
 
 #### 3.2 直接安装
