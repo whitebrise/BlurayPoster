@@ -494,21 +494,22 @@ class Emby(Media):
         for item_id, last_played_time in played_info_copy.items():
             if now_time - last_played_time > self._repeat_filter_timeout:
                 self._played_info.pop(item_id)
+        # 报告结束
+        position_ticks = kwargs["position_ticks"]
+        total_ticks = kwargs["total_ticks"]
+        # for block_session in self._block_sessions:
+        #     self._session_play_stopped(block_session["Id"], position_ticks)
+        # 设置影片已播放(观看超过70%设置为已观看)
+        if total_ticks >= 6000000000 and position_ticks >= 0.7 * total_ticks:
+            self._set_if_watched(True)
+        # else:
+        #     self._set_if_watched(False)
+
         # 通知av,tv
         if self._tv is not None:
             self._tv.play_end(self.on_message)
         if self._av is not None:
             self._av.play_end(self.on_message)
-        # # 报告结束
-        # position_ticks = kwargs["position_ticks"]
-        # total_ticks = kwargs["total_ticks"]
-        # for block_session in self._block_sessions:
-        #     self._session_play_stopped(block_session["Id"], position_ticks)
-        # # 设置影片已播放
-        # if position_ticks >= 0.7 * total_ticks:
-        #     self._set_if_watched(True)
-        # else:
-        #     self._set_if_watched(False)
         self._play_item = None
 
     def start_before(self, **kwargs):
