@@ -42,7 +42,7 @@ Media:
 Player:
   # 引用的播放机执行器，支持oppo和pioneer, pioneer只支持高清先生固件(m9708测试通过)
   Executor: player.oppo.Oppo
-  #Executor: player.Pioneer.Pioneer
+  #Executor: player.pioneer.Pioneer
   # 播放机ip, 改成你自己的
   IP: 192.168.1.11
   # SMB认证信息(按照下方格式，配置至少2个不同的用户, 不用smb可以不改), pioneer 不需要(由于固件限制只能在播放机上先手动进入共享目录, nfs同理)
