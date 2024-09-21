@@ -40,11 +40,12 @@ Media:
 
 # 播放器配置
 Player:
-  # 引用的播放机执行器，不要改
+  # 引用的播放机执行器，支持oppo和pioneer, pioneer只支持高清先生固件(m9708测试通过)
   Executor: player.oppo.Oppo
+  #Executor: player.Pioneer.Pioneer
   # 播放机ip, 改成你自己的
   IP: 192.168.1.11
-  # SMB认证信息(按照下方格式，配置至少2个不同的用户, 不用smb可以不改)
+  # SMB认证信息(按照下方格式，配置至少2个不同的用户, 不用smb可以不改), pioneer 不需要(由于固件限制只能在播放机上先手动进入共享目录, nfs同理)
   Auth:
     - Username: username1
       Password: password1
@@ -55,7 +56,7 @@ Player:
   # 是否优先启用nfs, true为使用nfs, false为使用smb
   NFSPrefer: true
   # 文件夹映射路径(不用的协议路径值可以留空)
-  # 文件最后有路径配置说明
+  # 文件最后有路径配置说明, pioneer请参照 pioneer部分
   MappingPath:
     - Media: /path1
       SMB: /smb_host1
@@ -151,5 +152,31 @@ TV:
 #
 #  如果第一步傻瓜配置中路径有中文的，建议按第二步说的，把相同的路径约掉，尽量避开中文。
 #
+#### 路径配置说明 -> pioneer
+# 不管 smb,或者 nfs, 只支持单一共享文件夹, 如果有多个共享文件夹, 建议合并成一个上层目录再通过 nfs 或者 smb 进行共享.
+# 否则播放不同目录的电影都需要手动在播放机上切换到对应目录, 比较麻烦, 还可能切换的目录对不上就播放失败,导致黑屏, 只能重启播放机.
+# 以 nfs 举例: media部分和上面 oppo一致,
+# nfs部分去掉 ip后面以"-"开头那一节, 比如
+# Media: /volume1/Media/Movie
+# NFS: /10.0.1.4/Movie
+# 在播放机看到的路径是 10.0.1.4/-volume1-Media/Movie, 去掉"-volume1-Media"就是/10.0.1.4/Movie
+#
+# 多个硬盘或多个分区如何用一个共享目录(可以有子目录, 但是最层用于共享的目录只能一个):
+# 1. 比较笨的办法就是把蓝光片全部落到一个硬盘然后共享.
+# 2. 多个硬盘组 raid, 把蓝光放到一个目录,然后共享.
+# 3. 不用动数据,但是需要折腾(需要执行 linux命令)的方法, 以群辉nfs举例:
+#   1) 新建一个共享文件夹什么都不放, 我的是在/volume4/BluRay.
+#   2) 将之前的共享文件夹的 nfs关掉(目的是不让蓝光机看到, 防止挂载错目录).
+#   3) 将每个其他盘的电影目录挂载到 /volume4/BluRay 目录下.
+#      打开 DSM -> 控制面板 -> 计划任务 -> 新增 -> 触发的任务 -> 用户自定义脚本,
+#      任务名称自定, 用户账号选 root, 事件选开机, 已开启勾选上,
+#      点击任务设置标签,用户自定义脚本填写:
+#      #!/bin/bash
+#      mount --bind /volume1/Media/Movie/ /volume4/BluRay/Media
+#      mount --bind /volume2/Share/Movie/ /volume4/BluRay/Share
+#      保存, 保存后点击运行看是否成功, 正常应该在/volume4/BluRay/Media 目录看到 /volume1/Media/Movie/ 目录下的内容
+#   mount 的目标目录可以随便指定(最好不要有特殊字符), 只要在 NFS填对应的就行
+  # 配置好后，先启动播放机，点击电影，点击共享的目录比如我是 10.0.1.4,
+  # 然后点击共享的目录， 我这里是 -volume4-BluRay (一定要先点到这里,不然点播放会黑屏只能重启)， 然后就可以正常使用 emby播放
 #
 #### 路径配置说明 -> 结束
