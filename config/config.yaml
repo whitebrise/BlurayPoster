@@ -70,7 +70,7 @@ Player:
 TV:
   # 引用的TV执行器
   # 目前有2个，一个sony bravia，一个lg的, 根据你的电视类型选择
-  # 索尼就用tv.sony_bravia.SonyBravia, LG就用tv.lg_webos.LGWebos
+  # 索尼就用tv.sony_bravia.SonyBravia, LG就用tv.lg_webos.LGWebos, HDFURY就用tv.hdfury.Hdfury
   Executor: tv.sony_bravia.SonyBravia
   # 电视IP, 改成你自己的
   IP: 192.168.1.12
