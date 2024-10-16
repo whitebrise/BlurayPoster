@@ -69,19 +69,20 @@ Player:
 # 电视配置
 TV:
   # 引用的TV执行器
-  # 目前有2个，一个sony bravia，一个lg的, 根据你的电视类型选择
-  # 索尼就用tv.sony_bravia.SonyBravia, LG就用tv.lg_webos.LGWebos, HDFURY就用tv.hdfury.Hdfury
+  # 目前电视有2个，一个sony bravia，一个lg的, 根据你的电视类型选择，其它设备有2个，一个HDFURY,一个OPPO
+  # 索尼就用tv.sony_bravia.SonyBravia, LG就用tv.lg_webos.LGWebos, HDFURY就用tv.hdfury.Hdfury,OPPO就用tv.oppo_hdmi.OppoHdmi
   Executor: tv.sony_bravia.SonyBravia
-  # 电视IP, 改成你自己的
+  # 电视或其它设备的IP, 改成你自己的
   IP: 192.168.1.12
   # 电视控制识别码, 改成你自己的
   Key: "1234"
   # 播放机对应的HDMI口, 改成你自己的
-  HDMI: 1
+  HDMI: 0
   # 播放结束后电视默认切换策略, 改成你自己的
   # null 执行默认策略, sony为跳转到emby app, Lg为返回原来页面
   # app=xxxx 例如"app=netflix" 代表返回netflix app
   # hdmi=x 例如"hdmi=3"代表返回 hdmi 3输入源
+  # oppo系列，如果选择 HDMI输入 则填写hdmi；如果选择HDMI输入直通 则填写pass。
   PlayStopUri: null
 
 
