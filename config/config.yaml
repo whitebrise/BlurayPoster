@@ -27,6 +27,7 @@ Media:
   # 阻止播放的设备列表, 改成你自己的, 一行一个
   # 在app上选片后，本身设备也会进行串流播放，通过添加设备名称列表，比如你想选片的电视/手机，可以阻止它们串流播放，避免播放器和app两个同时播放
   # 该设备名称可在 emby服务器-设备 里看到，每个设备图片下面第一排就是设备名
+  # 也可以emby里不点击播放按钮而是点击收藏/已播放按钮也可以启动影片。这样就可以不填BlockDevices，加载速度会比点击播放按钮然后阻止选片设备播放快一点
   BlockDevices:
     - SONY XR-77A95L
   # 排除的文件扩展名, 一行一个
@@ -41,8 +42,8 @@ Media:
 # 播放器配置
 Player:
   # 引用的播放机执行器，支持oppo和pioneer, pioneer只支持高清先生固件(m9708测试通过)
+  # oppo填写player.oppo.Oppo，pionner填写player.pioneer.Pioneer
   Executor: player.oppo.Oppo
-  #Executor: player.pioneer.Pioneer
   # 播放机ip, 改成你自己的
   IP: 192.168.1.11
   # SMB认证信息(按照下方格式，配置至少2个不同的用户, 不用smb可以不改), pioneer 不需要(由于固件限制只能在播放机上先手动进入共享目录, nfs同理)
@@ -82,7 +83,7 @@ TV:
   # null 执行默认策略, sony为跳转到emby app, Lg为返回原来页面
   # app=xxxx 例如"app=netflix" 代表返回netflix app
   # hdmi=x 例如"hdmi=3"代表返回 hdmi 3输入源
-  # oppo系列，如果选择 HDMI输入 则填写hdmi；如果选择HDMI输入直通 则填写pass。
+  # oppo系列，如果希望结束后停留在HDMI输入 则填写hdmi=1；如果选择HDMI输入直通 则填写pass=1。
   PlayStopUri: null
 
 

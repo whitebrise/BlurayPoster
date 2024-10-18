@@ -19,11 +19,8 @@ class OppoHdmi(TV):
             self._hdmi = self._config.get('HDMI', 1)
             self._play_stop_uri = self._config.get('PlayStopUri', None)
             self._uri = f"http://{self._ip}:436"
-
-
         except Exception as e:
             raise TVException(e)
-
 
     def _choose_hdmi(self, hdmi):
         """

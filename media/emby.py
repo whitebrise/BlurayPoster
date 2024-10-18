@@ -140,24 +140,31 @@ class Emby(Media):
         """
         retry_count = 0
         while True:
-            websocket_url = (self._host.replace("http", "ws") + "/embywebsocket?api_key="
-                             + self._access_token + "&deviceId=" + self._device_id)
-            self._ws = websocket.WebSocketApp(
-                websocket_url,
-                on_message=self._on_ws_message,
-                on_error=self._on_ws_error,
-                on_close=self._on_ws_close,
-                on_open=self._on_ws_open,
-                header=self._get_headers
-            )
-            self._ws.run_forever(ping_interval=10)
-            self._ws = None
-            retry_count += 1
-            wait_time = min(60, (2 ** retry_count))
-            logger.error(f"Attempting to reconnect in {wait_time} seconds...")
-            time.sleep(wait_time)
-            if retry_count >= 10:
-                retry_count = 0
+            try:
+                websocket_url = (self._host.replace("http", "ws") + "/embywebsocket?api_key="
+                                 + self._access_token + "&deviceId=" + self._device_id)
+                self._ws = websocket.WebSocketApp(
+                    websocket_url,
+                    on_message=self._on_ws_message,
+                    on_error=self._on_ws_error,
+                    on_close=self._on_ws_close,
+                    on_open=self._on_ws_open,
+                    header=self._get_headers
+                )
+                self._ws.run_forever(ping_interval=10)
+                self._ws = None
+                retry_count += 1
+                wait_time = min(60, (2 ** retry_count))
+                logger.error(f"Attempting to reconnect in {wait_time} seconds...")
+                time.sleep(wait_time)
+                if retry_count >= 10:
+                    retry_count = 0
+            except websocket.WebSocketException as e1:
+                logger.error(f"Emby WebSocket error: {e1}")
+                time.sleep(5)  # 等待一段时间再尝试重连
+            except Exception as e2:
+                logger.error(f"Emby Other error: {e2}")
+                time.sleep(5)  # 等待一段时间再尝试重连
 
     def _handle_msg(self, msg_data):
         """
@@ -214,6 +221,8 @@ class Emby(Media):
         :return:
         """
         try:
+            if len(self._block_devices) <= 0:
+                return True
             self._block_sessions.clear()
             self._session = None
             url = "{}/emby/Sessions".format(self._host)
