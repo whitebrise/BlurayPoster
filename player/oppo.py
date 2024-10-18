@@ -138,10 +138,13 @@ class Oppo(Player):
                 result = res.json()
                 if "success" in result and result["success"]:
                     return True
+                else:
+                    logger.error(f"login samba failed, reason: {res.text}")
+                    return result["retInfo"]
             logger.error(f"login samba failed, reason: {res.text}")
         except Exception as e:
             logger.error(f"login samba exception, error: {e}")
-        return False
+        return "unexpected error"
 
     def _mount_shared_folder(self, host, folder, username, password):
         """
@@ -163,10 +166,13 @@ class Oppo(Player):
                 result = res.json()
                 if "success" in result and result["success"]:
                     return True
+                else:
+                    logger.error(f"mount samba shared folder failed, reason: {res.text}")
+                    return result["retInfo"]
             logger.error(f"mount samba shared folder failed, reason: {res.text}")
         except Exception as e:
             logger.error(f"mount samba shared folder exception, error: {e}")
-        return False
+        return "unexpected error"
 
     def _get_samba_share_folder_list(self):
         """
@@ -291,10 +297,13 @@ class Oppo(Player):
                 result = res.json()
                 if "success" in result and result["success"]:
                     return True
+                else:
+                    logger.error(f"login nfs failed, reason: {res.text}")
+                    return result["retInfo"]
             logger.error(f"login nfs failed, reason: {res.text}")
         except Exception as e:
             logger.error(f"login nfs exception, error: {e}")
-        return False
+        return "unexpected error"
 
     def _mount_nfs_shared_folder(self, host, folder):
         """
@@ -315,10 +324,13 @@ class Oppo(Player):
                 result = res.json()
                 if "success" in result and result["success"]:
                     return True
+                else:
+                    logger.error(f"mount nfs share folder failed, reason: {res.text}")
+                    return result["retInfo"]
             logger.error(f"mount nfs share folder failed, reason: {res.text}")
         except Exception as e:
             logger.error(f"mount nfs share folder exception, error: {e}")
-        return False
+        return "unexpected error"
 
     def _check_folder_has_bdmv(self, nfs_prefer, path):
         """
@@ -515,20 +527,27 @@ class Oppo(Player):
         sever, folder, file = self.extract_path_parts(real_path)
         logger.debug("curt path, sever: {}, folder:  {}, file: {}".format(sever, folder, file))
         if self._use_nfs:
-            if not self._login_nfs(sever):
-                return on_message("Error", "cannot login nfs")
-            if not self._mount_nfs_shared_folder(sever, folder):
-                return on_message("Error", "cannot mount nfs folder")
+            login_result = self._login_nfs(sever)
+            if login_result is not True:
+                return on_message("Error", "cannot login nfs, {}".format(login_result))
+            mount_result = self._mount_nfs_shared_folder(sever, folder)
+            if mount_result is not True:
+                return on_message("Error", "cannot mount nfs folder, {}".format(mount_result))
         else:
-            if not self._login_samba_with_out_id(sever):
-                return on_message("Error", "cannot login smb")
+            login_result = self._login_samba_with_out_id(sever)
+            if login_result is not True:
+                return on_message("Error", "cannot login smb, {}".format(login_result))
             used_key = None
+            mount_info = ''
             for auth_item in self._auth:
-                if self._mount_shared_folder(sever, folder, auth_item["Username"], auth_item["Password"]) is True:
+                mount_result = self._mount_shared_folder(sever, folder, auth_item["Username"], auth_item["Password"])
+                if mount_result is True:
                     used_key = auth_item
                     break
+                else:
+                    mount_info += ", " + str(mount_result)
             if used_key is None:
-                return on_message("Error", "cannot mount smb folder")
+                return on_message("Error", "cannot mount smb folder{}".format(mount_info))
             # 用过的key移到队尾
             self._auth.remove(used_key)
             self._auth.append(used_key)
