@@ -221,10 +221,10 @@ class Emby(Media):
         :return:
         """
         try:
-            if len(self._block_devices) <= 0:
-                return True
             self._block_sessions.clear()
             self._session = None
+            if len(self._block_devices) <= 0:
+                return True
             url = "{}/emby/Sessions".format(self._host)
             headers = self._get_headers()
             res = requests.get(url=url, headers=headers)
