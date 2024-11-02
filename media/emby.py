@@ -120,9 +120,12 @@ class Emby(Media):
             logger.error(f"Exception during device registration: {e}")
 
     def _on_ws_message(self, ws, message):
-        logger.debug(f"Emby WebSocket Message Received: {message}")
-        msg = json.loads(message)
-        self._handle_msg(msg)
+        try:
+            logger.debug(f"Emby WebSocket Message Received: {message}")
+            msg = json.loads(message)
+            self._handle_msg(msg)
+        except Exception as e:
+            logger.error(f"Exception during WebSocket message handling: {e}")
 
     def _on_ws_error(self, ws, error):
         logger.error(f"Emby WebSocket Error: {error}")
@@ -476,9 +479,15 @@ class Emby(Media):
             pass
         # 然后通知tv,av
         if self._tv is not None:
-            self._tv.play_begin(self.on_message)
+            try:
+                self._tv.play_begin(self.on_message)
+            except Exception as e:
+                logger.error(f"Exception during tv play begin: {e}")
         if self._av is not None:
-            self._av.play_begin(self.on_message)
+            try:
+                self._av.play_begin(self.on_message)
+            except Exception as e:
+                logger.error(f"Exception during av play begin: {e}")
 
     def on_play_in_progress(self, **kwargs):
         """
@@ -516,9 +525,15 @@ class Emby(Media):
 
         # 通知av,tv
         if self._tv is not None:
-            self._tv.play_end(self.on_message)
+            try:
+                self._tv.play_end(self.on_message)
+            except Exception as e:
+                logger.error(f"Exception during tv play end: {e}")
         if self._av is not None:
-            self._av.play_end(self.on_message)
+            try:
+                self._av.play_end(self.on_message)
+            except Exception as e:
+                logger.error(f"Exception during av play end: {e}")
         self._play_item = None
 
     def start_before(self, **kwargs):

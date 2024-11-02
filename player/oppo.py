@@ -15,7 +15,7 @@ class Oppo(Player):
     def __init__(self, config: dict):
         super().__init__(config)
         try:
-            self._ip = self._config.get('IP', 10)
+            self._ip = self._config.get('IP')
             self._udp_timeout = self._config.get('UdpTimeout', 10)
             self._auth = self._config.get('Auth', [])
             self._use_nfs = self._config.get('NFSPrefer', True)

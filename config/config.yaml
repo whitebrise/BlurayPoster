@@ -2,7 +2,7 @@
 # 每次修改完配置后，必须重启程序才能生效
 
 # 版本号
-Version: "0.6.2"
+Version: "1.0.0"
 
 # 日志级别(如果发生问题搞不定的，把info改成debug然后重启，再把出问题时候的日志发上来, 问题修复后再改回info)
 LogLevel: info
@@ -86,6 +86,17 @@ TV:
   # oppo系列，如果希望结束后停留在HDMI输入 则填写hdmi=1；如果选择HDMI输入直通 则填写pass=1。
   PlayStopUri: null
 
+
+# AV功放配置
+AV:
+  # 引用的AV执行器
+  Executor: av.onkyo.Onkyo
+  # AV功放ip, 改成你自己的
+  IP: 192.168.1.13
+  # 播放开始时功放切换策略，改成你自己的,默认切回bd hdmi接口
+  PlayStartUri: source=bd
+  # 播放结束后功放切换策略，改成你自己的(默认切换tv-earc)
+  PlayStopUri: source=tv
 
 
 #### 路径配置说明 -> 开始

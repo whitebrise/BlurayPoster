@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11
 ARG BLURAY_POSTER_VERSION
 ENV LANG="C.UTF-8" \
     TZ="Asia/Shanghai" \
