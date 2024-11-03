@@ -1,0 +1,48 @@
+"""
+For Onkyo AVReceiver
+"""
+import time
+
+import eiscp
+import logging
+from typing import Callable
+
+
+from abstract_classes import AV, AVException
+
+
+logger = logging.getLogger(__name__)
+
+
+class Onkyo(AV):
+    def __init__(self, config: dict):
+        super().__init__(config)
+        try:
+            self._ip = self._config.get('IP')
+            self._play_start_uri = self._config.get('PlayStartUri')
+            self._play_stop_uri = self._config.get('PlayStopUri')
+        except Exception as e:
+            raise AVException(e)
+
+    def start_before(self, **kwargs):
+        pass
+
+    def play_begin(self, on_message: Callable[[str, str], None], **kwargs):
+        if self._play_start_uri is None:
+            return
+        steps = str.split(self._play_start_uri, "&")
+        with eiscp.eISCP(self._ip) as receiver:
+            for step in steps:
+                command, operate = str.split(step, "=")
+                receiver.command('{} {}'.format(command, operate))
+                time.sleep(0.5)
+
+    def play_end(self, on_message: Callable[[str, str], None], **kwargs):
+        if self._play_stop_uri is None:
+            return
+        steps = str.split(self._play_stop_uri, "&")
+        with eiscp.eISCP(self._ip) as receiver:
+            for step in steps:
+                command, operate = str.split(step, "=")
+                receiver.command('{} {}'.format(command, operate))
+                time.sleep(0.5)
