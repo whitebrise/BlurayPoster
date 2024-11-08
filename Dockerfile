@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.11-slim
 ARG BLURAY_POSTER_VERSION
 ENV LANG="C.UTF-8" \
     TZ="Asia/Shanghai" \
@@ -12,7 +12,13 @@ COPY . .
 
 RUN apt-get update -y \
     && apt-get upgrade -y \
-    && pip install --no-cache-dir -r requirements.txt
+    && apt-get install -y --no-install-recommends \
+       build-essential \
+       gcc \
+       python3-dev \
+    && pip install --no-cache-dir -r requirements.txt \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY entrypoint /usr/local/bin/
 

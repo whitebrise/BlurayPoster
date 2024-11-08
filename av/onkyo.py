@@ -34,6 +34,7 @@ class Onkyo(AV):
         with eiscp.eISCP(self._ip) as receiver:
             for step in steps:
                 command, operate = str.split(step, "=")
+                logger.debug("onkyo play begin command: {}, operate: {}".format(command, operate))
                 receiver.command('{} {}'.format(command, operate))
                 time.sleep(0.5)
 
@@ -44,5 +45,6 @@ class Onkyo(AV):
         with eiscp.eISCP(self._ip) as receiver:
             for step in steps:
                 command, operate = str.split(step, "=")
+                logger.debug("onkyo play end command: {}, operate: {}".format(command, operate))
                 receiver.command('{} {}'.format(command, operate))
                 time.sleep(0.5)
