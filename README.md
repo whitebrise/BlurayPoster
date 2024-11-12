@@ -40,13 +40,16 @@
 ```docker-cli
 docker run -itd \
     --name blurayposter \
+    --log-driver=json-file \
+    --log-opt max-size=2m \
+    --log-opt max-file=7 \
     --hostname blurayposter \
     -v /blurayposter/config:/config \
     -e 'PUID=0' \
     -e 'PGID=0' \
     -e 'UMASK=000' \
     -e 'TZ=Asia/Shanghai' \
-    --restart always \
+    --restart unless-stopped \
     whitebrise/blurayposter:latest
 ```
 
@@ -58,6 +61,11 @@ services:
     blurayposter:
         image: whitebrise/blurayposter:latest
         container_name: blurayposter
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "2m"
+                max-file: "7"
         volumes:
             - /blurayposter/config:/config
         environment:
@@ -65,7 +73,7 @@ services:
             - 'PGID=0'
             - 'UMASK=000'
             - 'TZ=Asia/Shanghai'
-        restart: always
+        restart: unless-stopped
         tty: true
         stdin_open: true
 ```

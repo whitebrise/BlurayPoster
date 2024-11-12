@@ -154,7 +154,7 @@ class Emby(Media):
                     on_open=self._on_ws_open,
                     header=self._get_headers
                 )
-                self._ws.run_forever(ping_interval=10)
+                self._ws.run_forever()
                 self._ws = None
                 retry_count += 1
                 wait_time = min(60, (2 ** retry_count))

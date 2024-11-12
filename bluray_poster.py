@@ -18,24 +18,9 @@ def setup_logging(log_level_str):
     logger = logging.getLogger()
     log_level = getattr(logging, log_level_str.upper(), logging.DEBUG)
     logger.setLevel(log_level)
-
-    handler = TimedRotatingFileHandler(
-        filename=os.path.join(log_directory, 'bluray_poster.log'),
-        when='midnight',
-        interval=1,
-        backupCount=7,
-        encoding='utf-8'
-    )
-
-    formatter = logging.Formatter(
-        '%(asctime)s %(filename)s %(levelname)s, clientID: console, message: %(message)s'
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    if log_level == logging.DEBUG:
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(log_level)
-        logger.addHandler(console_handler)
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(log_level)
+    logger.addHandler(console_handler)
 
 
 def dynamic_import(module_name, class_name):
@@ -109,8 +94,8 @@ if __name__ == "__main__":
         my_config = Configuration(path=config_dir)
         if my_config.initialize():
             setup_logging(my_config.get("LogLevel"))
-            logger = logging.getLogger(__name__)
-            logger.info("Starting the main application")
+            my_logger = logging.getLogger(__name__)
+            my_logger.info("Starting the main application")
             my_media = initialize_components(my_config)
             my_media.start_before()
             my_media.start()
