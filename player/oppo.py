@@ -95,7 +95,7 @@ class Oppo(Player):
                 "appIpAddress": "192.168.1.8",
             }
             url = self._http_host + "/signin?" + self.dict_to_url_encoded_json(params)
-            res = requests.get(url, timeout=1)
+            res = requests.get(url, timeout=5)
             if res.status_code == 200:
                 result = res.json()
                 if "success" in result and result["success"]:

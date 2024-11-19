@@ -121,7 +121,7 @@ class Emby(Media):
 
     def _on_ws_message(self, ws, message):
         try:
-            logger.debug(f"Emby WebSocket Message Received: {message}")
+            logger.info(f"Emby WebSocket Message Received: {message}")
             msg = json.loads(message)
             self._handle_msg(msg)
         except Exception as e:
@@ -131,7 +131,7 @@ class Emby(Media):
         logger.error(f"Emby WebSocket Error: {error}")
 
     def _on_ws_open(self, ws):
-        logger.debug("Emby WebSocket Connection Opened")
+        logger.info("Emby WebSocket Connection Opened")
 
     def _on_ws_close(self, ws, close_status_code, close_msg):
         logger.error(f"Emby WebSocket Close, code: {close_status_code}, msg: {close_msg}")
@@ -141,11 +141,16 @@ class Emby(Media):
         连接ws
         :return:
         """
-        retry_count = 0
+        retry_count = 0  # 重试计数器
+        max_retries = 10  # 最大连续重试次数
+
         while True:
             try:
+                # 构造 WebSocket URL
                 websocket_url = (self._host.replace("http", "ws") + "/embywebsocket?api_key="
                                  + self._access_token + "&deviceId=" + self._device_id)
+
+                # 创建 WebSocket 连接对象
                 self._ws = websocket.WebSocketApp(
                     websocket_url,
                     on_message=self._on_ws_message,
@@ -154,20 +159,45 @@ class Emby(Media):
                     on_open=self._on_ws_open,
                     header=self._get_headers
                 )
-                self._ws.run_forever()
-                self._ws = None
+
+                logger.info("尝试连接 WebSocket...")
+
+                # 启动 WebSocket，并阻塞等待连接断开
+                self._ws.run_forever(ping_interval=30, ping_timeout=10)
+
+                # 如果 WebSocket 未抛出异常但断开，表示成功连接过
+                logger.warning("WebSocket 已断开，准备清理资源并重连...")
+                retry_count = 0  # 重置重试计数
+
+            except (websocket.WebSocketException, BrokenPipeError) as e:
+                # 捕获 WebSocket 和 Broken pipe 异常
+                logger.error(f"WebSocket 异常：{e}，尝试重连...")
                 retry_count += 1
+
+            except Exception as e:
+                logger.error(f"未知错误：{e}，尝试重连...")
+                retry_count += 1
+
+            finally:
+                # 检查重试次数是否超过最大限制
+                if retry_count > max_retries:
+                    logger.error("超过最大重试次数，停止尝试连接。")
+                    break
+
+                # 确保清理资源，关闭 WebSocket 对象
+                if self._ws:
+                    try:
+                        self._ws.close()
+                        logger.info("WebSocket 连接已关闭，资源清理完成。")
+                    except Exception as close_error:
+                        logger.error(f"关闭 WebSocket 时发生错误：{close_error}")
+                    finally:
+                        self._ws = None  # 确保释放对象
+
+                # 计算重试等待时间（指数退避算法）
                 wait_time = min(60, (2 ** retry_count))
-                logger.error(f"Attempting to reconnect in {wait_time} seconds...")
+                logger.info(f"{wait_time} 秒后重试连接...")
                 time.sleep(wait_time)
-                if retry_count >= 10:
-                    retry_count = 0
-            except websocket.WebSocketException as e1:
-                logger.error(f"Emby WebSocket error: {e1}")
-                time.sleep(5)  # 等待一段时间再尝试重连
-            except Exception as e2:
-                logger.error(f"Emby Other error: {e2}")
-                time.sleep(5)  # 等待一段时间再尝试重连
 
     def _handle_msg(self, msg_data):
         """
