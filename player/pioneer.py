@@ -1,4 +1,5 @@
 import time
+import socket
 import logging
 import requests
 import json
@@ -23,12 +24,19 @@ class Pioneer(Player):
         super().__init__(config)
         try:
             self._ip = self._config.get('IP', 10)
+            self._port = 8090
             self._use_nfs = self._config.get('NFSPrefer', True)
-            self._http_host = f"http://{self._ip}:8090/jsonrpc"
+            self._http_host = f"http://{self._ip}:{self._port}/jsonrpc"
             self._mapping_path_list = self._config.get('MappingPath')
             self._play_start_timeout = self._config.get('PlayStartTimeout', 5)
             self._play_end_timeout = self._config.get('PlayEndTimeout', 5)
             self._device_list = []
+
+            self._startup_key_sequence = self._config.get('StartupKeySequence', [])
+            self._startup_wait = self._config.get('StartupWait', 5)
+            self._online_status = 1
+            self._offline_count = 0
+
             self._on_message = None
             self._on_play_begin = None
             self._on_play_in_progress = None
@@ -38,9 +46,23 @@ class Pioneer(Player):
                 "Content-Type": "application/json",
             }
 
+            self._control_keys = {
+                "left": 258048,
+                "right": 258049,
+                "up": 258050,
+                "down": 258051,
+                "ok": 323584,
+                "return": 651267,
+                "home": 585730,
+            }
+
             self._position_ticks = 0
             self._total_ticks = 0
             self._play_status = -1
+
+            thread = threading.Thread(target=self._track_online_status)
+            thread.daemon = True
+            thread.start()
         except Exception as e:
             raise PlayerException(e)
 
@@ -73,8 +95,71 @@ class Pioneer(Player):
                 if "result" in result:
                     return result
         except Exception as e:
-            logger.error(f"get samba share folder failed, error: {e}")
+            logger.error(f"get play info failed, error: {e}")
         return None
+
+    def _is_port_open(self) -> bool:
+        """
+        检测主机的指定端口是否开放。
+        :return: 如果端口开放返回 True，否则返回 False
+        """
+        try:
+            conn = socket.create_connection((self._ip, self._port), timeout=1)
+            conn.close()  # 确保关闭连接
+            return True
+        except (socket.timeout, ConnectionRefusedError):
+            return False
+        except Exception as e:
+            logger.debug(f"检测端口时出错: {e}")
+            return False
+
+    def _send_control_key(self, key):
+        """
+        发送控制按键
+        :return:
+            bool
+        """
+        if not key:
+            return True
+
+        logger.debug(f"send control key: {key}")
+        try:
+            request_body = {"method": "Remoter.SendKey", "params": {"key": self._control_keys[key]}, "id": "1", "jsonrpc": "2.0"}
+            res = requests.post(self._http_host, headers=self._headers, data=json.dumps(request_body), timeout=1)
+            if res.status_code == 200:
+                return True
+        except Exception as e:
+            logger.debug(f"send control key failed, error: {e}")
+            return False
+        return None
+
+    def _send_control_sequence(self, keys):
+        logger.debug(f"send control sequence: {keys}")
+        for key in keys:
+            self._send_control_key(key)
+            time.sleep(1)
+
+    def _track_online_status(self):
+        logger.debug("track online status")
+        while True:
+            time.sleep(1)
+            online = self._is_port_open()
+            if online:
+                if self._online_status == 0:
+                    self._offline_count = 0
+                    self._online_status = 1
+                    logger.debug("set online status to 1")
+                    time.sleep(self._startup_wait)
+                    self._send_control_sequence(self._startup_key_sequence)
+            else:
+                if self._online_status == 1:
+                    # 关机检测， 如果连续5次检测不到在线状态，则设置为离线
+                    self._offline_count += 1
+                    logger.debug(f"offline count: {self._offline_count}")
+                    if self._offline_count > 5:
+                        self._online_status = 0
+                        self._offline_count = 0
+                        logger.debug("set online status to 0")
 
     def _track_play_status(self):
         """
