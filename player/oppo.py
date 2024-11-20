@@ -278,7 +278,7 @@ class Oppo(Player):
                         files.append(file)
             return files
         except Exception as e:
-            logger.error(f"get nfs share folder failed, error: {e}")
+            logger.error(f"get share folder failed, error: {e}")
         return None
 
     def _login_nfs(self, host):
@@ -526,7 +526,7 @@ class Oppo(Player):
         logger.debug("transfer path, from: {}, to: {}".format(media_path, real_path))
         sever, folder, file = self.extract_path_parts(real_path)
         logger.debug("curt path, sever: {}, folder:  {}, file: {}".format(sever, folder, file))
-        if self._use_nfs:
+        if self._use_nfs is True:
             login_result = self._login_nfs(sever)
             if login_result is not True:
                 return on_message("Error", "cannot login nfs, {}".format(login_result))
