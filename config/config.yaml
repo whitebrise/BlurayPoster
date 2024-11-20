@@ -42,7 +42,7 @@ Media:
 # 播放器配置
 Player:
   # 引用的播放机执行器，支持oppo和pioneer, pioneer只支持高清先生固件(m9708测试通过)
-  # oppo填写player.oppo.Oppo，pionner填写player.pioneer.Pioneer
+  # oppo填写player.oppo.Oppo，pionner请改成player.pioneer.Pioneer
   Executor: player.oppo.Oppo
   # 播放机ip, 改成你自己的
   IP: 192.168.1.11
@@ -56,6 +56,21 @@ Player:
   UdpTimeout: 10
   # 是否优先启用nfs, true为使用nfs, false为使用smb
   NFSPrefer: true
+
+  # 检测到开机后发送的控制按键，只支持pionner,  支持的按键有：ok, left, right, up, down, return, home
+  # 默认的按键是在要进入的共享盘和子目录都在第一个的情况，其他情况请自行修改,按键之间会自动插入1秒的延迟。
+  # 如果插入多1 秒的延迟可以像下面一样发送一个空的 key.(这里在 ok键后面插入空key增加 1 秒延迟是因为电影界面进入稍慢)
+  StartupKeySequence:
+    - right
+    - ok
+    -
+    - ok
+    - down
+    - ok
+  # 开机发送按键的延迟时间， 开机后发现smb,nfs需要一定时间，等待一会儿防止进目录后smb/nfs还没有出现。
+  # 根据自己网络发现速度调整。
+  StartupWait: 5
+
   # 文件夹映射路径(不用的协议路径值可以留空)
   # 文件最后有路径配置说明, pioneer请参照 pioneer部分
   MappingPath:
