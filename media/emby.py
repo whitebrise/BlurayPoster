@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 class Emby(Media):
-    def __init__(self, player: Player, tv: TV, av: AV, config: dict):
-        super().__init__(player, tv, av, config)
+    def __init__(self, player: Player, tv: TV, av: AV, config: dict, subPlayer: Player):
+        super().__init__(player, tv, av, config, subPlayer)
         try:
             self._host = config.get('Host')
             self._user_name = config.get('Username')
@@ -241,6 +241,10 @@ class Emby(Media):
                         continue
                     if path.split('.')[-1] in self._exclude_video_ext:
                         logger.info(f"exclude video, path: {path}")
+                        if self._subPlayer is not None:
+                            self._play_item = item
+                            self._run_sub_player()
+                            return
                         continue
                     self._play_item = item
                     logger.info(f"prepare to play this video, path: {path}")
@@ -471,6 +475,32 @@ class Emby(Media):
                                  self.on_message, self.on_play_begin,
                                  self.on_play_in_progress, self.on_play_end)
 
+
+
+
+    def _run_sub_player(self):
+        """
+        调用副sub_player播放器
+        :return:
+        """
+        if self._subPlayer is None:
+            logger.error("no player is ready")
+            return False
+        if self._play_item is None:
+            logger.error("no video info")
+            return False
+        # 播放
+        self._subPlayer.play(self._play_item["Path"], self._play_item["Container"],
+                                 self.on_message, self.on_play_begin,
+                                 self.on_play_in_progress, self.on_play_end)
+
+        # 阻止正在串流的播放
+        if self._get_all_sessions() is not True:
+            return False
+        for block_session in self._block_sessions:
+            self._session_playing_stop(block_session["Id"])
+        return True
+
     def _connect(self):
         """
         连接Emby服务器
@@ -510,12 +540,18 @@ class Emby(Media):
         # 然后通知tv,av
         if self._tv is not None:
             try:
-                self._tv.play_begin(self.on_message)
+                if 'subPlayer' in kwargs:
+                    self._tv.play_begin(self.on_message, subPlayer=1)
+                else:
+                    self._tv.play_begin(self.on_message)
             except Exception as e:
                 logger.error(f"Exception during tv play begin: {e}")
         if self._av is not None:
             try:
-                self._av.play_begin(self.on_message)
+                if 'subPlayer' in kwargs:
+                    self._av.play_begin(self.on_message, subPlayer=1)
+                else:
+                    self._av.play_begin(self.on_message)
             except Exception as e:
                 logger.error(f"Exception during av play begin: {e}")
 

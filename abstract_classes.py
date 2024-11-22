@@ -105,11 +105,12 @@ class Media(ABC):
     """
     媒体基类
     """
-    def __init__(self, player: Player, tv: TV, av: AV, config: dict):
+    def __init__(self, player: Player, tv: TV, av: AV, config: dict, subPlayer: Player):
         self._player = player
         self._tv = tv
         self._av = av
         self._config = config
+        self._subPlayer = subPlayer
 
     @abstractmethod
     def start_before(self, **kwargs):
