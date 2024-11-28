@@ -1,5 +1,6 @@
 # YAML配置
 # 每次修改完配置后，必须重启程序才能生效
+# 使用 # 来注释掉某行
 
 # 版本号
 Version: "1.0.0"
@@ -24,12 +25,12 @@ Media:
   Username: aabbccddee
   # 媒体库服务器的密码, 改成你自己的
   Password: abcd123456789
-  # 阻止播放的设备列表, 改成你自己的, 一行一个
+  # 阻止播放的设备列表, 改成你自己的, 一行一个，也可以留空
   # 在app上选片后，本身设备也会进行串流播放，通过添加设备名称列表，比如你想选片的电视/手机，可以阻止它们串流播放，避免播放器和app两个同时播放
   # 该设备名称可在 emby服务器-设备 里看到，每个设备图片下面第一排就是设备名
   # 也可以emby里不点击播放按钮而是点击收藏/已播放按钮也可以启动影片。这样就可以不填BlockDevices，加载速度会比点击播放按钮然后阻止选片设备播放快一点
   BlockDevices:
-    - SONY XR-77A95L
+    #- SONY XR-77A95L
   # 排除的文件扩展名, 一行一个
   # 格式命中的文件会直接用点击海报的那个设备播放，不会调用蓝光机
   ExcludeVideoExt:
@@ -41,8 +42,11 @@ Media:
 
 # 播放器配置
 Player:
-  # 引用的播放机执行器，支持oppo和pioneer, pioneer只支持高清先生固件(m9708测试通过)
-  # oppo填写player.oppo.Oppo，pionner请改成player.pioneer.Pioneer
+  # 引用的播放机执行器(默认oppo)
+  # 可供选择的执行器请看程序所在目录的player文件夹下，使用player.<filename>.<classname>来命名
+  # 目前有以下几种:
+    # player.oppo.Oppo
+    # player.pioneer.Pioneer
   Executor: player.oppo.Oppo
   # 播放机ip, 改成你自己的
   IP: 192.168.1.11
@@ -84,10 +88,14 @@ Player:
 
 # 电视配置
 TV:
-  # 引用的TV执行器
-  # 目前电视有2个，一个sony bravia，一个lg的, 根据你的电视类型选择，其它设备有2个，一个HDFURY,一个OPPO
-  # 索尼就用tv.sony_bravia.SonyBravia, LG就用tv.lg_webos.LGWebos, HDFURY就用tv.hdfury.Hdfury,OPPO就用tv.oppo_hdmi.OppoHdmi
-  Executor: tv.sony_bravia.SonyBravia
+  # 引用的TV执行器(默认null不启用)
+  # 可供选择的执行器请看程序所在目录的tv文件夹下，使用tv.<filename>.<classname>来命名
+  # 目前有以下几种:
+    # tv.sony_bravia.SonyBravia
+    # tv.lg_webos.LGWebos
+    # tv.oppo_hdmi.OppoHdmi
+    # tv.hdfury.Hdfury
+  Executor: null
   # 电视或其它设备的IP, 改成你自己的
   IP: 192.168.1.12
   # 电视控制识别码, 改成你自己的
@@ -104,8 +112,11 @@ TV:
 
 # AV功放配置
 AV:
-  # 引用的AV执行器
-  Executor: av.onkyo.Onkyo
+  # 引用的AV执行器(默认null不启用)
+  # 可供选择的执行器请看程序所在目录的av文件夹下，使用av.<filename>.<classname>来命名
+  # 目前有以下几种:
+    # av.onkyo.Onkyo
+  Executor: null
   # AV功放ip, 改成你自己的
   IP: 192.168.1.13
   # 播放开始时功放切换策略，改成你自己的,默认代表切换副输出以及切到bd

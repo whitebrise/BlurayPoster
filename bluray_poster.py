@@ -55,12 +55,9 @@ def initialize_component(component_key, config, exception_class):
             module_name, class_name = component_config["Executor"].rsplit('.', 1)
             cls = dynamic_import(module_name, class_name)
             return cls(component_config)
-        except ImportError as e:
+        except Exception as e:
             logging.error(f"Error importing {component_key}: {e}")
-            raise exception_class(f"Error initializing {component_key}")
-    else:
-        logging.warning(f"Configuration for {component_key} not found or incomplete.")
-        return None
+    return None
 
 
 def initialize_components(config):
@@ -103,5 +100,5 @@ if __name__ == "__main__":
                 time.sleep(100)
         else:
             print("Failed to initialize configuration")
-    except Exception as e:
-        print("Failed to start program, ex: {}".format(e))
+    except Exception as ee:
+        print("Failed to start program, ex: {}".format(ee))
