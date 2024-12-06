@@ -85,6 +85,38 @@ Player:
       SMB: /smb_host2
       NFS: /192.168.1.10/path2
 
+# 副播放器配置
+SubPlayer:
+  # 流媒体用的播放机执行器，支持coreelec，如果不用，请注释掉Executor这一行
+  # 目前有以下几种:
+    # player.coreelec.Coreelec
+  # Executor: player.coreelec.Coreelec
+  #是否副播放器
+  SubPlayer: True
+  # 播放机ip, 改成你自己的
+  IP: 192.168.1.112
+  Port: 8080
+  # ce认证信息
+  User: kodi
+  Password: 123456
+  # SMB认证信息 (暂不要用)
+  Auth:
+    - Username: username1
+      Password: password1
+    - Username: username2
+      Password: password2
+  # udp超时时间，不要改
+  UdpTimeout: 10
+  # 是否优先启用nfs, 仅测试过nfs
+  NFSPrefer: true
+  # 文件夹映射路径(不用的协议路径值可以留空)
+  MappingPath:
+    - Media: /path1
+      SMB:
+      NFS: /192.168.1.10/path1
+    - Media: /path2
+      SMB:
+      NFS: /192.168.1.10/path2
 
 # 电视配置
 TV:
@@ -102,6 +134,8 @@ TV:
   Key: "1234"
   # 播放机对应的HDMI口, 改成你自己的
   HDMI: 0
+  # 副播放器对应的HDMI口,oppo系列不支持
+  SubHDMI: 1
   # 播放结束后电视默认切换策略, 改成你自己的
   # null 执行默认策略, sony为跳转到emby app, Lg为返回原来页面
   # app=xxxx 例如"app=netflix" 代表返回netflix app
@@ -116,11 +150,15 @@ AV:
   # 可供选择的执行器请看程序所在目录的av文件夹下，使用av.<filename>.<classname>来命名
   # 目前有以下几种:
     # av.onkyo.Onkyo
+    # av.yamaha.Yamaha
   Executor: null
   # AV功放ip, 改成你自己的
   IP: 192.168.1.13
   # 播放开始时功放切换策略，改成你自己的,默认代表切换副输出以及切到bd
+  # yamaha功放填hdmi1、hdmi2、hdmi3、av1等等
   PlayStartUri: hdmi-output-selector=out-sub&source=bd
+  # 副播放器切换输入
+  SubPlayStartUri: hdmi2
   # 播放结束后功放切换策略，改成你自己的(默认代表切回主输出且切到tv-earc)
   PlayStopUri: hdmi-output-selector=out&source=tv
 

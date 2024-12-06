@@ -70,12 +70,13 @@ def initialize_components(config):
         player = initialize_component("Player", config, PlayerException)
         tv = initialize_component("TV", config, TVException)
         av = initialize_component("AV", config, AVException)
+        subPlayer = initialize_component("SubPlayer", config, PlayerException)
 
         media_config = config.get("Media")
         if media_config and "Executor" in media_config:
             module_name, class_name = media_config["Executor"].rsplit('.', 1)
             media_class = dynamic_import(module_name, class_name)
-            media = media_class(player, tv, av, media_config)
+            media = media_class(player, tv, av, media_config, subPlayer)
             logging.info("Media operations completed successfully")
             return media
         else:
