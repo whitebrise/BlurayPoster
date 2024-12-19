@@ -104,7 +104,7 @@ class Coreelec(Player):
                 else:
                     continue
             if self._play_status == 0:
-                if "time" in play_info["result"]:
+                if play_info["result"]["speed"] == 1:
                     self._play_status = 1
                     logger.debug("set playing status to 1")
                     if self._subPlayer is True:
@@ -116,21 +116,18 @@ class Coreelec(Player):
                 else:
                     continue
             elif self._play_status == 1:
-                if "time" in play_info["result"]:
-                    total_hours = play_info["result"]["totaltime"]["hours"]
-                    total_minutes = play_info["result"]["totaltime"]["minutes"]
-                    total_seconds = play_info["result"]["totaltime"]["seconds"]
-                    total_milliseconds = play_info["result"]["totaltime"]["milliseconds"]
-
-                    self._total_ticks = total_hours * 3600000000 + total_minutes * 60000000 + total_seconds * 1000000 + total_milliseconds * 1000
-                    if self._total_ticks == 0:
-                        break
-
+                if not (play_info["result"]["speed"] == 0 and play_info["result"]["position"] == -1):
                     if time.time() - last_report_time > 60:
+                        total_hours = play_info["result"]["totaltime"]["hours"]
+                        total_minutes = play_info["result"]["totaltime"]["minutes"]
+                        total_seconds = play_info["result"]["totaltime"]["seconds"]
+                        total_milliseconds = play_info["result"]["totaltime"]["milliseconds"]
+
                         elapse_hours = play_info["result"]["time"]["hours"]
                         elapse_minutes = play_info["result"]["time"]["minutes"]
                         elapse_seconds = play_info["result"]["time"]["seconds"]
                         elapse_milliseconds = play_info["result"]["time"]["milliseconds"]
+                        self._total_ticks = total_hours * 3600000000 + total_minutes * 60000000 + total_seconds * 1000000 + total_milliseconds * 1000
                         self._position_ticks = elapse_hours * 3600000000 + elapse_minutes * 60000000 + elapse_seconds * 1000000 + elapse_milliseconds * 1000
 
                         self._on_play_in_progress(position_ticks=self._position_ticks, total_ticks=self._total_ticks)
