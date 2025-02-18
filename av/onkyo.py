@@ -35,6 +35,9 @@ class Onkyo(AV):
             for step in steps:
                 command, operate = str.split(step, "=")
                 logger.debug("onkyo play begin command: {}, operate: {}".format(command, operate))
+                if command.lower() == 'sleep':
+                    time.sleep(int(operate))
+                    continue
                 receiver.command('{} {}'.format(command, operate))
                 time.sleep(0.5)
 

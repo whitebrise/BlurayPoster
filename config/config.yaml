@@ -115,7 +115,7 @@ AV:
   # 引用的AV执行器(默认null不启用)
   # 可供选择的执行器请看程序所在目录的av文件夹下，使用av.<filename>.<classname>来命名
   # 目前有以下几种:
-    # av.onkyo.Onkyo
+    # av.onkyo.Onkyo 所有可用命令可查看docs/onkyo-eiscp-command.yaml
   Executor: null
   # AV功放ip, 改成你自己的
   IP: 192.168.1.13
