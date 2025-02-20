@@ -1,7 +1,10 @@
 """
-此类为抽象类，需要增加其他设备必须继承该类并重写方法
-start_before用于初始化设备等
-...
+Copyright (C) 2025 whitebrise
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
 """
 
 from abc import ABC, abstractmethod
