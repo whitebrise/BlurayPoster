@@ -116,6 +116,7 @@ AV:
   # 可供选择的执行器请看程序所在目录的av文件夹下，使用av.<filename>.<classname>来命名
   # 目前有以下几种:
     # av.onkyo.Onkyo 所有可用命令可查看docs/onkyo-eiscp-command.yaml
+    # av.yamaha.Yamaha 目前可用命令如hdmi=hdmi1(或hdmi2、hdmi3、av1等等）
   Executor: null
   # AV功放ip, 改成你自己的
   IP: 192.168.1.13

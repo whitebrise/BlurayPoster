@@ -1,6 +1,12 @@
 """
-Yamaha 苏州
+Copyright (C) 2025 whitebrise
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
 """
+
 import time
 import requests
 import logging
@@ -19,7 +25,6 @@ class Yamaha(AV):
         try:
             self._ip = self._config.get('IP')
             self._play_start_uri = self._config.get('PlayStartUri')
-            self._sub_play_start_uri = self._config.get('SubPlayStartUri')
             self._play_stop_uri = self._config.get('PlayStopUri')
             self._uri = "http://{}/".format(self._ip)
         except Exception as e:
@@ -77,23 +82,33 @@ class Yamaha(AV):
     def start_before(self, **kwargs):
         pass
 
-    def play_begin(self, on_message, **kwargs):
+    def play_begin(self, on_message: Callable[[str, str], None], **kwargs):
+        if self._play_start_uri is None:
+            return
+        steps = str.split(self._play_start_uri, "&")
         if not self._get_power_status():
             self._change_power()
             time.sleep(3)
-        if "subPlayer" in kwargs:
-            if self._sub_play_start_uri is None:
-                return
-            self._change_hdmi(self._sub_play_start_uri)
-            return
+        for step in steps:
+            command, operate = str.split(step, "=")
+            logger.debug("yamaha play begin command: {}, operate: {}".format(command, operate))
+            if command.lower() == 'sleep':
+                time.sleep(int(operate))
+                continue
+            elif command.lower() == 'hdmi':
+                self._change_hdmi(operate)
+            time.sleep(0.5)
 
-        if self._play_start_uri is None:
-            return
-        self._change_hdmi(self._play_start_uri)
-
-
-    def play_end(self, on_message, **kwargs):
+    def play_end(self, on_message: Callable[[str, str], None], **kwargs):
         if self._play_stop_uri is None:
             return
-        self._change_hdmi(self._play_stop_uri)
-
+        steps = str.split(self._play_stop_uri, "&")
+        for step in steps:
+            command, operate = str.split(step, "=")
+            logger.debug("yamaha play end command: {}, operate: {}".format(command, operate))
+            if command.lower() == 'sleep':
+                time.sleep(int(operate))
+                continue
+            elif command.lower() == 'hdmi':
+                self._change_hdmi(operate)
+            time.sleep(0.5)
