@@ -31,6 +31,7 @@ class Oppo(Player):
             self._udp_server_address = (self._ip, 7624)
             self._http_host = f"http://{self._ip}:436"
             self._mapping_path_list = self._config.get('MappingPath')
+            self._force_mount_path = self._config.get('ForceMountPath')
             self._play_start_timeout = self._config.get('PlayStartTimeout', 5)
             self._play_end_timeout = self._config.get('PlayEndTimeout', 5)
             self._device_list = []
@@ -326,7 +327,7 @@ class Oppo(Player):
                 "server": host,
                 "folder": folder,
             }
-            print("mount path, {}".format(params))
+            logger.debug("mount path, {}".format(params))
             url = self._http_host + "/mountNfsSharedFolder?" + self.dict_to_url_encoded_json(params)
             res = requests.get(url, timeout=5)
             if res.status_code == 200:
@@ -534,6 +535,11 @@ class Oppo(Player):
         real_path = real_path.replace("//", "/")
         logger.debug("transfer path, from: {}, to: {}".format(media_path, real_path))
         sever, folder, file = self.extract_path_parts(real_path)
+        if self._force_mount_path is not None and self._force_mount_path in folder:
+            remain_path = folder.replace(self._force_mount_path, "")
+            file = remain_path + "/" + file
+            file = file.lstrip("/")
+            folder = self._force_mount_path
         logger.debug("curt path, sever: {}, folder:  {}, file: {}".format(sever, folder, file))
         if self._use_nfs is True:
             login_result = self._login_nfs(sever)

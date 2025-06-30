@@ -74,7 +74,8 @@ Player:
   # 开机发送按键的延迟时间， 开机后发现smb,nfs需要一定时间，等待一会儿防止进目录后smb/nfs还没有出现。
   # 根据自己网络发现速度调整。
   StartupWait: 5
-
+  # 指定强制挂载目录(一般可以留空或填null, 如果是飞牛等设备，必须填写nfs根目录，例如 fs/1000/nfs)
+  ForceMountPath: null
   # 文件夹映射路径(不用的协议路径值可以留空)
   # 文件最后有路径配置说明, pioneer请参照 pioneer部分
   MappingPath:
