@@ -1,5 +1,6 @@
-requests==2.32.3
+requests==2.32.4
 websocket-client==1.8.0
 pywebostv==0.8.9
 pyyaml==6.0.1
 onkyo-eiscp==1.2.7
+denonavr==1.2.0
