@@ -23,7 +23,7 @@ class Pioneer(Player):
     def __init__(self, config: dict):
         super().__init__(config)
         try:
-            self._ip = self._config.get('IP', 10)
+            self._ip = self._config.get('IP', '127.0.0.1')
             self._port = 8090
             self._use_nfs = self._config.get('NFSPrefer', True)
             self._http_host = f"http://{self._ip}:{self._port}/jsonrpc"
@@ -60,6 +60,7 @@ class Pioneer(Player):
             self._total_ticks = 0
             self._play_status = -1
 
+            # 先完成所有变量初始化，再启动线程
             thread = threading.Thread(target=self._track_online_status)
             thread.daemon = True
             thread.start()
@@ -89,13 +90,13 @@ class Pioneer(Player):
         """
         try:
             request_body = {"method": "Playback.GetPlayingStatus", "id": "1", "jsonrpc": "2.0"}
-            res = requests.post(self._http_host, headers=self._headers, data=json.dumps(request_body))
+            res = requests.post(self._http_host, headers=self._headers, data=json.dumps(request_body), timeout=2)
             if res.status_code == 200:
                 result = res.json()
                 if "result" in result:
                     return result
         except Exception as e:
-            logger.error(f"get play info failed, error: {e}")
+            logger.debug(f"get play info failed, error: {e}")
         return None
 
     def _is_port_open(self) -> bool:
@@ -142,24 +143,30 @@ class Pioneer(Player):
     def _track_online_status(self):
         logger.debug("track online status")
         while True:
-            time.sleep(1)
+            time.sleep(2)
             online = self._is_port_open()
             if online:
+                # 状态如果是离线，则切换为在线，并执行开机序列
                 if self._online_status == 0:
-                    self._offline_count = 0
                     self._online_status = 1
+                    self._offline_count = 0
                     logger.debug("set online status to 1")
                     time.sleep(self._startup_wait)
                     self._send_control_sequence(self._startup_key_sequence)
+                else:
+                    # 如果已经是在线状态，确保计数器重置
+                    if self._offline_count > 0:
+                        self._offline_count = 0
             else:
+                # 状态如果是在线，则累加离线计数
                 if self._online_status == 1:
-                    # 关机检测， 如果连续5次检测不到在线状态，则设置为离线
                     self._offline_count += 1
                     logger.debug(f"offline count: {self._offline_count}")
                     if self._offline_count > 5:
                         self._online_status = 0
                         self._offline_count = 0
                         logger.debug("set online status to 0")
+
 
     def _track_play_status(self):
         """
